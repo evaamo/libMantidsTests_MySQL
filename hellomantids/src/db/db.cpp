@@ -37,9 +37,21 @@ bool DB::start()
     dbAuth.setUser(Globals::getLC_Database_DbUser());
     dbAuth.setPass(Globals::getLC_Database_DbPass());
 
-    statusOK = db.connect(dbHost, dbPort, dbAuth, dbName) && initSchema();
+    statusOK = db.connect(dbHost, dbPort, dbAuth, dbName);
     
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Succesfully connected to MySQL Database server '%s' ", dbHost.c_str());
+    if (statusOK)
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Succesfully connected to MySQL Database server '%s' ", dbHost.c_str());
+    else
+    {
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to connect to the database: %s @%s:%d", db.getDBName().c_str(), db.getDBHostname().c_str(), db.getDBPort());
+        return false;
+    }
+
+    if (!initSchema())
+    {
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Failed to initialize schema @ MySQL Database");
+        return false;
+    }
 
     return statusOK;
 }
@@ -48,6 +60,7 @@ bool DB::getStatusOK()
 {
     return statusOK;
 }
+
 
 bool DB::initSchema()
 {

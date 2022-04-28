@@ -31,6 +31,7 @@ public:
     ///////////////////
     static bool getStatusOK();
 
+
 private:
     // WEB DISPLAY FUNCTIONS:
     static json getMessages(Mantids::Authentication::Manager *auth, Mantids::Authentication::Session *sess,const json &payload);
